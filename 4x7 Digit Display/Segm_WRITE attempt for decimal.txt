@@ -1,0 +1,60 @@
+void Segm_WRITE(float number){
+	//Prints given number to display
+	int whole = number;
+	int fractal = ((number - int(whole)) * 1e7) + 0.9999;
+	while ((fractal % 10 == 0) && (fractal != 0)) fractal /= 10;
+	int countDigits = 0, helperTemp = 0, segment = 1;
+	int tempCP = whole; //whole copy to temporary copy
+	//Counting how many digits are in the whole part
+	while(tempCP != 0){
+		countDigits++;
+		tempCP /= 10;
+	}
+	helperTemp = countDigits;
+	//Getting individual digits of whole part
+	tempCP = whole;
+	int wh[4]; //Had to because of some error, otherwise this would be wh[countDigits]
+	for(int cnt = 0; cnt <= countDigits; cnt++){
+		wh[cnt] = tempCP % 10;
+		tempCP /= 10;
+	}
+	/*write whole*/
+	//dec
+	tempCP = fractal; //fractal copy to temp CP
+	//Counting how many digits are in the fractal part
+	while(tempCP != 0){
+		countDigits++;
+		tempCP /= 10;
+	}
+	//Getting individual digits of fractal part
+	tempCP = fractal;
+	int fr[4];
+	for(int cnt = 0; cnt <= countDigits; cnt++){
+		fr[cnt] = tempCP % 10;
+		tempCP /= 10;
+	}
+	countDigits -= helperTemp; //How many more places are available on the display
+	/*fractal out*/	//writing out everyting
+	for(int times = 0; times <= 50; times++){
+		segment = 1;
+		//Writing out all digits it can of whole part
+		for(int tein = helperTemp-1; tein >= 0; tein--){
+			segm_N_ON(segment);
+			GPIOA -> BSRR = num[wh[tein]];
+			if(tein == 0 && fractal != 0) Segm_DP_ON(segment);
+			for(int k = 0; k < 25000; k++);
+			Segm_OFF();
+			segment++;
+		}
+		//Writing out all digits it can of fractal part
+		if(countDigits != 0){
+			for(int rein = countDigits-1; rein >= 0; rein--){
+				segm_N_ON(segment);
+				GPIOA -> BSRR = num[fr[rein]];
+				for(int k = 0; k < 20000; k++);
+				Segm_OFF();
+				segment++;
+			}
+		}
+	}
+}
